@@ -1,6 +1,6 @@
 # Terraform
-.terraform/
-.terraform.lock.hcl
+**/.terraform/
+**/.terraform.lock.hcl
 *.tfstate
 *.tfstate.*
 crash.log
@@ -9,6 +9,7 @@ crash.log
 __pycache__/
 *.pyc
 .venv/
+.pytest_cache/
 
 # Sonstiges
 .DS_Store

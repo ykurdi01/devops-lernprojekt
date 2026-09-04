@@ -1,0 +1,21 @@
+# Braucht einen Ingress Controller im Cluster, zum Beispiel ingress-nginx.
+# Lokal muss lernprojekt.local zusaetzlich in der hosts Datei auf den Cluster zeigen.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: lernprojekt-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: lernprojekt.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: lernprojekt-service
+                port:
+                  number: 80

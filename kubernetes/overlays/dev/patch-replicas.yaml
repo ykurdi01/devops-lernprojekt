@@ -1,0 +1,7 @@
+# In dev reicht eine Replica, das spart lokale Ressourcen.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lernprojekt-app
+spec:
+  replicas: 1

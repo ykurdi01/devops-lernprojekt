@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  python-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Abhaengigkeiten installieren
+        run: pip install -r app/requirements.txt -r app/requirements-dev.txt
+      - name: Tests ausfuehren
+        run: pytest app/tests
+
+  docker-build:
+    runs-on: ubuntu-latest
+    needs: python-tests
+    steps:
+      - uses: actions/checkout@v4
+      - name: Image bauen
+        run: docker build -t lernprojekt-app:ci -f docker/Dockerfile .
+
+  hadolint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Dockerfile linten
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: docker/Dockerfile
+
+  terraform-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - name: Format pruefen
+        run: terraform fmt -check -recursive terraform
+      - name: Module initialisieren und validieren
+        run: |
+          for env in dev prod; do
+            terraform -chdir=terraform/environments/$env init -backend=false
+            terraform -chdir=terraform/environments/$env validate
+          done
+
+  kustomize-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Kustomize Overlays bauen
+        run: |
+          for overlay in dev prod; do
+            kubectl kustomize kubernetes/overlays/$overlay > /dev/null
+          done

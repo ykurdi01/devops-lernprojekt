@@ -1,0 +1,20 @@
+# Erlaubt eingehenden Traffic auf Redis nur von Pods mit dem Label app=lernprojekt-app.
+# Braucht ein CNI Plugin mit NetworkPolicy Unterstuetzung, zum Beispiel Calico.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: redis-nur-von-app
+spec:
+  podSelector:
+    matchLabels:
+      app: redis
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: lernprojekt-app
+      ports:
+        - protocol: TCP
+          port: 6379

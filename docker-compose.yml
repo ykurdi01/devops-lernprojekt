@@ -1,5 +1,15 @@
-# Damit man die App auch ohne Kubernetes schnell lokal testen kann.
+# Damit man die App inklusive Redis auch ohne Kubernetes schnell lokal testen kann.
 services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
   web:
     build:
       context: .
@@ -7,4 +17,10 @@ services:
     ports:
       - "5000:5000"
     environment:
-      APP_VERSION: "0.1.0"
+      APP_VERSION: "0.2.0"
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      APP_SECRET_KEY: "lokales-test-secret"
+    depends_on:
+      redis:
+        condition: service_healthy

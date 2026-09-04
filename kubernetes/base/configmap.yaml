@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: lernprojekt-config
+data:
+  APP_VERSION: "0.2.0"
+  REDIS_HOST: "redis-service"
+  REDIS_PORT: "6379"
